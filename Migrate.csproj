@@ -33,8 +33,7 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <PropertyGroup>
-      <PostBuildEvent>mkdir "F:\SteamLibrary\steamapps\common\Subnautica\BepInEx\plugins\Migrate2"
-copy /Y "$(ProjectDir)$(OutDir)Migrate2.dll" "F:\SteamLibrary\steamapps\common\Subnautica\BepInEx\plugins\Migrate2\Migrate2.dll"
+      <PostBuildEvent>
 </PostBuildEvent>
     </PropertyGroup>
     <ItemGroup>
@@ -85,8 +84,11 @@ copy /Y "$(ProjectDir)$(OutDir)Migrate2.dll" "F:\SteamLibrary\steamapps\common\S
          Other similar extension points exist, see Microsoft.Common.targets.
     <Target Name="BeforeBuild">
     </Target>
-    <Target Name="AfterBuild">
-    </Target>
     -->
-
+    <Target Name="AfterBuild">
+        <Exec Command='IF NOT EXIST "F:\SteamLibrary\steamapps\common\Subnautica\BepInEx\plugins\Migrate2" (
+            mkdir "F:\SteamLibrary\steamapps\common\Subnautica\BepInEx\plugins\Migrate2"
+        )' />
+        <Exec Command='copy /Y "$(ProjectDir)$(OutDir)Migrate2.dll" "F:\SteamLibrary\steamapps\common\Subnautica\BepInEx\plugins\Migrate2\Migrate2.dll"' />
+    </Target>
 </Project>

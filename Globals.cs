@@ -5,12 +5,14 @@ namespace Migrate2
 {
     public class Globals
     {
+        public bool DeveloperMode = true;
+        
         private static Globals _instance;
         public static Globals Instance
         {
             get
             {
-                if (_instance == null)
+                if (_instance is null)
                     _instance = new Globals();
                 return _instance;
             }
@@ -19,6 +21,8 @@ namespace Migrate2
         public const string MyGuid = "me.nyxb.migrate";
         public const string PluginName = "Migrate2";
         public const string VersionString = "2.0";
+
+        public Helpers Helpers;
         
         public ManualLogSource Log { get; set; }
 

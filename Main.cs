@@ -53,7 +53,7 @@ namespace Migrate2
             }
             
             var globals = Globals.Instance;
-            if (__instance.GetBestAction() == null) 
+            if (__instance.GetBestAction() is null) 
                 return;
                 
             var action = __instance.GetBestAction().ToString().Split('(').Last().Replace(")", "");

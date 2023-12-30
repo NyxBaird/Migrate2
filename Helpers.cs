@@ -8,6 +8,17 @@ namespace Migrate2
     {
         private Globals globals;
         
+        private static Helpers _instance;
+        public static Helpers Instance
+        {
+            get
+            {
+                if (_instance is null)
+                    _instance = new Helpers();
+                return _instance;
+            }
+        }
+        
         public Helpers()
         {
             this.globals = Globals.Instance;
@@ -153,8 +164,15 @@ namespace Migrate2
             {
                 migrator.Value.SizePlacement = (migrator.Value.TypicalSize / globals.LargestMigratorSize * 100) / modifier;
                 
-                globals.Log.LogDebug(migrator + " received a size placement of " + migrator.Value.SizePlacement); 
+                if (globals.DeveloperMode)
+                    globals.Log.LogDebug(migrator + " received a size placement of " + migrator.Value.SizePlacement); 
             }
+        }
+
+        public void DevLog(string message)
+        {
+            if (globals.DeveloperMode)
+                globals.Log.LogDebug(message);
         }
     }
 }

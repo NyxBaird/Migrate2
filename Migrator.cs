@@ -9,6 +9,7 @@ namespace Migrate2
     public class Migrator
     {
         private Globals globals;
+        private Helpers helpers;
         
         /*
          * These are available right after game launch as presets for the species
@@ -33,6 +34,7 @@ namespace Migrate2
         public Migrator(TechType creature, Globals.MigrationTypes type, Globals.FoodChainStatus status, double typicalSize)
         {
             globals = Globals.Instance;
+            helpers = Helpers.Instance;
             
             TechType = creature;
             MigrationType = type;
@@ -45,17 +47,45 @@ namespace Migrate2
          */
         public void Migrate(Creature instance)
         {
+            if (instance is null)
+            {
+                Debug.LogError("Migrate called with a null Creature instance.");
+                return;
+            }
+
             _creature = instance;
-            _possibleDepth = this.GetPossibleDepth();
+            _possibleDepth = GetPossibleDepth();
+
+            // Ensure globals and Helpers are not null
+            if (globals is null)
+            {
+                Debug.LogError("Globals is null.");
+                return;
+            }
+
+            if (helpers is null)
+            {
+                Debug.LogError("Helpers is null.");
+                return;
+            }
+            
+
             
             if (_creature.name=="ReaperLeviathan(Clone)")
-                globals.Log.LogDebug(_creature.name + " has possible depth of " + _possibleDepth + " and is performing " + MigrationType);
+                helpers.DevLog(_creature.name + " has possible depth of " + _possibleDepth + " and is performing " + MigrationType);
             
             //Set the traversal range based on environmental factors
             SetTraversalRange();
             
             //Adjust the traversal range based on creature specific factors
             AdjustTraversalRangeForCreature();
+            
+            // Before accessing traversal range, ensure it's not null
+            if (_traversalRange is null)
+            {
+                Debug.LogError("_traversalRange is null.");
+                return;
+            }
 
             var minHeight = _traversalRange["current"] - _traversalRange["lower"];
             var maxHeight = _traversalRange["current"] + _traversalRange["upper"];
@@ -80,14 +110,16 @@ namespace Migrate2
             //If our fish is above the top margin send it down
             if (nextLoc.y > 0 - Globals.Margins[0])
             {
-                globals.Log.LogDebug("NextLoc " + nextLoc.y + " breached our top margin. Setting to -" + Globals.Margins[0]);
+                helpers.DevLog("NextLoc " + nextLoc.y + " breached our top margin. Setting to -" + Globals.Margins[0]);
+    
                 nextLoc.y = -Globals.Margins[0];
             }
 
             //If our fish is below the bottom margin send it up
             if (GetDistanceFromBottom() < Globals.Margins[1])
             {
-                globals.Log.LogDebug("NextLoc " + nextLoc.y + " breached our bottom margin (Distance; " + GetDistanceFromBottom() + "). Setting to " + (_possibleDepth + Globals.Margins[1]) + " DFB: " + GetDistanceFromBottom());
+                helpers.DevLog("NextLoc " + nextLoc.y + " breached our bottom margin (Distance; " + GetDistanceFromBottom() + "). Setting to " + (_possibleDepth + Globals.Margins[1]) + " DFB: " + GetDistanceFromBottom());
+    
                 nextLoc.y = _possibleDepth + Globals.Margins[1];
             }
 
@@ -96,7 +128,7 @@ namespace Migrate2
             
             _creature.leashPosition = nextLoc;
             
-            globals.Log.LogDebug(_creature.name + " was sent from " + _creature.transform.position + " to " + nextLoc + " with an avg distance travelled of " + avgDistance);
+            helpers.DevLog(_creature.name + " was sent from " + _creature.transform.position + " to " + nextLoc + " with an avg distance travelled of " + avgDistance);
         }
 
         /*
@@ -133,9 +165,9 @@ namespace Migrate2
             range["lower"] = _possibleDepth * lowerDiff;
 
             if (_creature.name=="ReaperLeviathan(Clone)") {
-                globals.Log.LogDebug("Light scalar; " + lightScalar);
-                globals.Log.LogDebug("The water column is " + _possibleDepth + " deep. Fish is @ " + _creature.transform.position.y + " and should be between " + (range["current"] - range["lower"]) + " & " + (range["current"] + range["upper"]) + " (Target: " + range["current"] + ")");
-                globals.Log.LogDebug("Player is @ " + PlayerPatch.Player.transform.position.y);
+                helpers.DevLog("Light scalar; " + lightScalar);
+                helpers.DevLog("The water column is " + _possibleDepth + " deep. Fish is @ " + _creature.transform.position.y + " and should be between " + (range["current"] - range["lower"]) + " & " + (range["current"] + range["upper"]) + " (Target: " + range["current"] + ")");
+                helpers.DevLog("Player is @ " + PlayerPatch.Player.transform.position.y);
             }
             
             _traversalRange = range;
